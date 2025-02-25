@@ -16,10 +16,12 @@ class FormRecordViewModel: ObservableObject {
 
     let types: [RcordType] = [.income, .outcome]
     let record: Record?
+    let databaseService: DatabaseServiceProtocol
     private let maxDigits = 10
     private let maxDecimals = 2
 
-    init(record: Record? = nil) {
+    init(_ databaseService: DatabaseServiceProtocol, record: Record? = nil) {
+        self.databaseService = databaseService
         self.record = record
         self.setUpInfoIfNeeded()
     }
@@ -70,7 +72,7 @@ class FormRecordViewModel: ObservableObject {
         self.selectedType == type
     }
 
-    func saveNewRecord(completion: @escaping () -> Void) {
+    func saveNewRecord(completion: @escaping (Record?) -> Void) {
         guard let amountDouble = Double(self.amount) else { return }
         self.loading = true
         if let record {
@@ -79,10 +81,17 @@ class FormRecordViewModel: ObservableObject {
                                         date: record.date,
                                         type: record.type,
                                         amount: amountDouble)
-            // TODO: Actualizar record existente en BD
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                self.loading = false
-                completion()
+            Task {
+                let saved = await self.databaseService.updateRecord(recordToUpdate)
+                if saved {
+                    await MainActor.run {
+                        self.loading = false
+                        completion(recordToUpdate)
+                    }
+                } else {
+                    // TODO: Mostrar un error
+                    print("Error al guardar")
+                }
             }
         } else {
             let recordToSave = Record(id: UUID().uuidString,
@@ -90,10 +99,17 @@ class FormRecordViewModel: ObservableObject {
                                       date: Date(),
                                       type: self.selectedType,
                                       amount: amountDouble)
-            // TODO: Guardar nuevo record en BD
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                self.loading = false
-                completion()
+            Task {
+                let saved = await self.databaseService.saveNewRecord(recordToSave)
+                if saved {
+                    await MainActor.run {
+                        self.loading = false
+                        completion(nil)
+                    }
+                } else {
+                    // TODO: Mostrar un error
+                    print("Error al guardar")
+                }
             }
         }
     }
