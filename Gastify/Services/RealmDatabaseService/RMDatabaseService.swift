@@ -14,7 +14,34 @@ class RMDatabaseService: DatabaseServiceProtocol {
     private let realm = try! Realm()
 
     func fetchRecords(filter: FilterItem) async -> [Record] {
-        return []
+        let calendar = Calendar.current
+        let now = Date()
+        var predicate: NSPredicate
+
+        switch filter {
+        case .today:
+            let startOfDay = calendar.startOfDay(for: now)
+            let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay)!
+            predicate = NSPredicate(format: "date >= %@ AND date < %@", startOfDay as NSDate, endOfDay as NSDate)
+
+        case .week:
+            let startOfWeek = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: now))!
+            let endOfWeek = calendar.date(byAdding: .day, value: 7, to: startOfWeek)!
+            predicate = NSPredicate(format: "date >= %@ AND date < %@", startOfWeek as NSDate, endOfWeek as NSDate)
+
+        case .month:
+            let components = calendar.dateComponents([.year, .month], from: now)
+            let startOfMonth = calendar.date(from: components)!
+            let endOfMonth = calendar.date(byAdding: .month, value: 1, to: startOfMonth)!
+            predicate = NSPredicate(format: "date >= %@ AND date < %@", startOfMonth as NSDate, endOfMonth as NSDate)
+
+        case .year:
+            let oneYearAgo = calendar.date(byAdding: .year, value: -1, to: now)!
+            predicate = NSPredicate(format: "date >= %@ AND date <= %@", oneYearAgo as NSDate, now as NSDate)
+        }
+
+        let results = realm.objects(RMRecord.self).filter(predicate)
+        return Array(results).map { $0.toRecord() }
     }
 
     func saveNewRecord(_ record: Record) async -> Bool {
