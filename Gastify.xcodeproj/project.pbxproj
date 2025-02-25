@@ -33,6 +33,16 @@
 		29F32B702D2B2BBA00AEFBC0 /* GastifyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GastifyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		29F32BD82D2B2EA200AEFBC0 /* Exceptions for "Gastify" folder in "Gastify" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 29F32B532D2B2BB900AEFBC0 /* Gastify */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		29F32B692D2B2BBA00AEFBC0 /* GastifyTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
@@ -46,6 +56,9 @@
 		};
 		29F32B972D2B2CA300AEFBC0 /* Gastify */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				29F32BD82D2B2EA200AEFBC0 /* Exceptions for "Gastify" folder in "Gastify" target */,
+			);
 			path = Gastify;
 			sourceTree = "<group>";
 		};
