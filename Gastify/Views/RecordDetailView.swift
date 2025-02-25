@@ -57,7 +57,13 @@ struct RecordDetailView: View {
         .sheet(item: self.$viewModel.sheet) { item in
             switch item {
             case .updateRecord(let record):
-                FormRecordView(viewModel: FormRecordViewModel(record: record))
+                FormRecordView(viewModel: FormRecordViewModel(self.viewModel.databaseService,
+                                                              record: record)) { record in
+                    if let record {
+                        self.viewModel.record = record
+                    }
+                    self.viewModel.sheet = nil
+                }
             }
         }
         .navigationTitle("Detalle de registro")
@@ -70,5 +76,6 @@ struct RecordDetailView: View {
                         date: Date(),
                         type: .income,
                         amount: 1000)
-    return RecordDetailView(viewModel: RecordDetailViewModel(record: record))
+    return RecordDetailView(viewModel: RecordDetailViewModel(MockDatabaseService(),
+                                                             record: record))
 }
