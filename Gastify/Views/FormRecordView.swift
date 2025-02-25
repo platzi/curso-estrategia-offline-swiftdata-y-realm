@@ -11,9 +11,9 @@ struct FormRecordView: View {
 
     @FocusState private var titleFieldIsFocused
 
-    @Environment(\.dismiss) private var dismiss
-
     @StateObject var viewModel: FormRecordViewModel
+
+    let completion: (Record?) -> Void
 
     var body: some View {
         ZStack {
@@ -40,7 +40,7 @@ struct FormRecordView: View {
             HStack {
                 Spacer()
                 Button(action: {
-                    dismiss()
+                    self.completion(nil)
                 }) {
                     IconImage(.close, size: 16, color: .dark)
                 }
@@ -88,8 +88,8 @@ struct FormRecordView: View {
         HStack {
             PrimaryButton(label: self.viewModel.buttonTitle,
                           disabled: self.viewModel.isButtonDisabled) {
-                self.viewModel.saveNewRecord {
-                    dismiss()
+                self.viewModel.saveNewRecord { record in
+                    self.completion(record)
                 }
             }
         }.padding(.horizontal)
@@ -97,5 +97,5 @@ struct FormRecordView: View {
 }
 
 #Preview {
-    FormRecordView(viewModel: FormRecordViewModel())
+    FormRecordView(viewModel: FormRecordViewModel(MockDatabaseService())) { _ in }
 }
