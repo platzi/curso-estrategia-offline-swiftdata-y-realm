@@ -9,9 +9,11 @@ import SwiftUI
 
 @main
 struct GastifyApp: App {
+    private let databaseService: DatabaseServiceProtocol = MockDatabaseService()
+
     var body: some Scene {
         WindowGroup {
-            HomeView(viewModel: HomeViewModel())
+            HomeView(viewModel: HomeViewModel(databaseService))
         }
     }
 }
